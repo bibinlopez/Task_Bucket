@@ -3,7 +3,11 @@ const Task = require('../models/task');
 const getAllTasks = async (req, res) => {
    try {
       const tasks = await Task.find({});
-      res.status(200).json({ tasks, nbhits: tasks.length });
+      // res.status(200).json({ tasks, nbhits: tasks.length });
+      res.status(200).json({
+         success: true,
+         data:{tasks, nbHits:tasks.length}
+      });
    } catch (error) {
       res.status(500).json({ msg: error });
    }
@@ -34,9 +38,7 @@ const getTask = async (req, res) => {
    }
 };
 
-const updateTask = (req, res) => {
-   res.send('update task');
-};
+
 
 const deleteTask = async (req, res) => {
    try {
@@ -46,13 +48,31 @@ const deleteTask = async (req, res) => {
          return res.status(404).json({ msg: `No task with Id: ${taskID}` });
       }
 
-      res.status(200).json({msg: `Deleted Task Successfully with Id :${taskID}`});
+      res.status(200).json({ msg: `Deleted Task Successfully with Id :${taskID}` });
    } catch (error) {
       res.status(500).json({ msg: error });
    }
 };
 
 
+const updateTask = async (req, res) => {
+   try {
+      const { id: taskID } = req.params;
+      const task = await Task.findOneAndUpdate({ _id: taskID }, { $set: req.body }, {
+         new: true,
+         runValidators: true, // issue on runValidators. this is not working, we need a manual validation.
+      })
+      if (!task) {
+         return res.status(404).json({ msg: `No task with Id: ${taskID}` });
+      }
+
+      res.status(200).json({ task });
+   } catch (error) {
+
+   }
+};
+
+
 module.exports = {
    getAllTasks, createTask, getTask, updateTask, deleteTask
-};
+}
