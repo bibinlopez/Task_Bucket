@@ -7,7 +7,6 @@ const getAllTasks = asyncWrapper(async (req, res) => {
    res.status(200).json({ tasks })
 })
 
-
 // const getAllTasks = async (req, res) => {
 //    try {
 //       const tasks = await Task.find({});
@@ -20,12 +19,6 @@ const getAllTasks = asyncWrapper(async (req, res) => {
 //    }
 // };
 
-// const createTask = asyncWrapper(async (req, res) => {
-//    const task = new Task(req.body);
-//    const result = await task.save();
-//    res.status(201).json({ result });
-// })
-
 
 const createTask = async (req, res, next) => {
    try {
@@ -36,21 +29,45 @@ const createTask = async (req, res, next) => {
       // res.status(500).json({ msg: error });
       next(error)
    }
-};
+}
+
+// const createTask = asyncWrapper(async (req, res) => {
+//    const task = new Task(req.body);
+//    const result = await task.save();
+//    res.status(201).json({ result });
+// })
 
 
-const getTask = async (req, res) => {
+const getTask = async (req, res, next) => {
    try {
       const { id: taskID } = req.params;
       const task = await Task.findOne({ _id: taskID });
       if (!task) {
+         const error = new Error('Not Found')
+         error.status = 404;
+         return next(error)
          return res.status(404).json({ msg: `No task with id: ${taskID}` });
       }
       res.status(200).json({ task });
    } catch (error) {
-      res.status(500).json({ msg: error });
+      next(error)
+      // res.status(500).json({ msg: error });
    }
 };
+
+
+// const getTask = async (req, res) => {
+//    try {
+//       const { id: taskID } = req.params;
+//       const task = await Task.findOne({ _id: taskID });
+//       if (!task) {
+//          return res.status(404).json({ msg: `No task with id: ${taskID}` });
+//       }
+//       res.status(200).json({ task });
+//    } catch (error) {
+//       res.status(500).json({ msg: error });
+//    }
+// };
 
 
 
