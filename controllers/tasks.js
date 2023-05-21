@@ -1,26 +1,40 @@
 const Task = require('../models/task');
-
-const getAllTasks = async (req, res) => {
-   try {
-      const tasks = await Task.find({});
-      // res.status(200).json({ tasks, nbhits: tasks.length });
-      res.status(200).json({
-         success: true,
-         data:{tasks, nbHits:tasks.length}
-      });
-   } catch (error) {
-      res.status(500).json({ msg: error });
-   }
-};
+const asyncWrapper = require('../middleware/async')
 
 
-const createTask = async (req, res) => {
+const getAllTasks = asyncWrapper(async (req, res) => {
+   const tasks = await Task.find({});
+   res.status(200).json({ tasks })
+})
+
+
+// const getAllTasks = async (req, res) => {
+//    try {
+//       const tasks = await Task.find({});
+//       res.status(200).json({
+//          success: true,
+//          data:{tasks, nbHits:tasks.length}
+//       });
+//    } catch (error) {
+//       res.status(500).json({ msg: error });
+//    }
+// };
+
+// const createTask = asyncWrapper(async (req, res) => {
+//    const task = new Task(req.body);
+//    const result = await task.save();
+//    res.status(201).json({ result });
+// })
+
+
+const createTask = async (req, res, next) => {
    try {
       const task = new Task(req.body);
       const result = await task.save();
       res.status(201).json({ result });
    } catch (error) {
-      res.status(500).json({ msg: error });
+      // res.status(500).json({ msg: error });
+      next(error)
    }
 };
 
